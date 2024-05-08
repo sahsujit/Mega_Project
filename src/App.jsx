@@ -10,6 +10,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import UpdataPassword from "./pages/UpdataPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import About from "./pages/About";
+import Contact from "./pages/Contact";
+
 
 
 function App() {
@@ -70,6 +72,8 @@ function App() {
 
           }
         />
+
+<Route path="/contact" element={<Contact />} />
       </Routes>
     </div>
   );
