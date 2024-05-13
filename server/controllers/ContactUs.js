@@ -1,5 +1,6 @@
 const { contactUsEmail } = require("../mail/templates/contactFormRes")
 const mailSender = require("../utils/mailSender");
+require("dotenv").config();
 
 
 exports.contactUsController = async(req, res)=>{
