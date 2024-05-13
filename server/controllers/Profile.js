@@ -9,7 +9,15 @@ require("dotenv").config();
 
 exports.updateProfile = async(req, res)=>{
     try{
-        const {dateOfBirth="", about="", contactNumber, gender}= req.body;
+        // const {dateOfBirth="", about="", contactNumber="", gender=""}= req.body;
+        const {
+          firstName = "",
+          lastName = "",
+          dateOfBirth = "",
+          about = "",
+          contactNumber = "",
+          gender = "",
+        } = req.body
         const id = req.user.id;
 
         if(!contactNumber || !gender || !id){
@@ -21,9 +29,15 @@ exports.updateProfile = async(req, res)=>{
 
 
         const userDetails = await User.findById(id);
-        const profileId = userDetails.additionalDetails;
-        const profileDetails = await Profile.findById(profileId);
+        // const profileId = userDetails.additionalDetails;
+        // const profileDetails = await Profile.findById(profileId);
+        const profileDetails = await Profile.findById(userDetails.additionalDetails)
 
+        const user = await User.findByIdAndUpdate(id, {
+          firstName,
+          lastName,
+        })
+        await user.save()
 
         profileDetails.dateOfBirth = dateOfBirth;
         profileDetails.about = about;
@@ -31,12 +45,14 @@ exports.updateProfile = async(req, res)=>{
         profileDetails.gender = gender;
 
         await profileDetails.save();
-
+        const updatedUserDetails = await User.findById(id)
+        .populate("additionalDetails")
+        .exec()
 
         return res.status(200).json({
             success:true,
             message:"Updated Profile Successfully",
-            profileDetails
+            updatedUserDetails
         })
        }
     catch(error){
