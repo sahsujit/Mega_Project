@@ -9,63 +9,7 @@ const Profile = require("../models/Profile");
 const {passwordUpdated} = require("../mail/templates/passwordUpdate")
 require('dotenv').config();
 
-//send OTP
 
-exports.sendotp = async(req, res) =>{
-    try{
-        const {email} = req.body;
-
-        const checkUserPresent = await User.findOne({email});
-
-        if(checkUserPresent){
-            return res.status(401).json({
-                success: false,
-                message:"User already registered",
-            })
-        };
-
-        // const otp = await otpGen();
-
-        var otp = otpGenerator.generate(6,{
-            upperCaseAlphabets:false,
-            lowerCaseAlphabets:false,
-            specialChars:false,
-        });
-
-
-        const result = await OTP.findOne({otp: otp});
-
-        while(result){
-            otp = otpGenerator.generate(6,{
-                upperCaseAlphabets:false,
-                
-            });
-            // result = await OTP.findOne({otp: otp});
-        };
-
-        const otpPayload = {email, otp};
-
-        const otpBody = await OTP.create(otpPayload);
-        console.log(otpBody);
-
-        res.status(200).json({
-            success: true,
-            message:"OTP sent successfully",
-            otp,
-        })
-    }
-    catch(error){
-        console.log(error);
-        return res.status(500).json({
-            success: false,
-            message:error.message,
-        });
-    }
-};
-
-
-
-//signUp
 exports.signup = async(req, res) =>{
     try{
         const {
@@ -139,6 +83,7 @@ exports.signup = async(req, res) =>{
             approved:approved,
             contactNumber,
             accountType,
+            // image:""
             image:`https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
         });
 
@@ -158,8 +103,6 @@ exports.signup = async(req, res) =>{
     }
 };
 
-
-//login 
 
 exports.login = async(req, res) => {
     try{
@@ -182,22 +125,40 @@ exports.login = async(req, res) => {
             });
         };
 
-        if(await bcrypt.compare(password, user.password)){
-            const payload = {
-                email:user.email,
-                id:user._id,
-                accountType:user.accountType,
-            };
+        // if(await bcrypt.compare(password, user.password)){
+        //     const payload = {
+        //         email:user.email,
+        //         id:user._id,
+        //         accountType:user.accountType,
+        //     };
 
-            const token = jwt.sign(payload, process.env.JWT_SECRET,{
-                expiresIn:"24h",
-            });
-            user.token = token;
-            user.password = undefined;
+        //     const token = jwt.sign(payload, process.env.JWT_SECRET,{
+        //         expiresIn:"24h",
+        //     });
+        //     user.token = token;
+        //     user.password = undefined;
 
+        //     const options = {
+        //         httpOnly:true,
+        //         expires: new Date(Date.now() + 3*24*60*60*1000),
+        //     }
+
+        if (await bcrypt.compare(password, user.password)) {
+            const token = jwt.sign(
+              { email: user.email, id: user._id, role: user.role },
+              process.env.JWT_SECRET,
+              {
+                expiresIn: "24h",
+              }
+            )
+      
+            // Save token to user document in database
+            user.token = token
+            user.password = undefined
+            // Set cookie for token and return success response
             const options = {
-                httpOnly:true,
-                expires: new Date(Date.now() + 3*24*60*60*1000),
+              expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+              httpOnly: true,
             }
 
             res.cookie("token", token , options).status(200).json({
@@ -222,6 +183,69 @@ exports.login = async(req, res) => {
          });
     }
 };
+//send OTP
+
+exports.sendotp = async(req, res) =>{
+    try{
+        const {email} = req.body;
+
+        const checkUserPresent = await User.findOne({email});
+
+        if(checkUserPresent){
+            return res.status(401).json({
+                success: false,
+                message:"User already registered",
+            })
+        };
+
+        // const otp = await otpGen();
+
+        var otp = otpGenerator.generate(6,{
+            upperCaseAlphabets:false,
+            lowerCaseAlphabets:false,
+            specialChars:false,
+        });
+
+
+        const result = await OTP.findOne({otp: otp});
+
+        while(result){
+            otp = otpGenerator.generate(6,{
+                upperCaseAlphabets:false,
+                
+            });
+            // result = await OTP.findOne({otp: otp});
+        };
+
+        const otpPayload = {email, otp};
+
+        const otpBody = await OTP.create(otpPayload);
+        console.log(otpBody);
+
+        res.status(200).json({
+            success: true,
+            message:"OTP sent successfully",
+            otp,
+        })
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message:error.message,
+        });
+    }
+};
+
+
+
+//signUp
+
+
+
+//login 
+
+
 
 exports.changePassword = async(req, res) =>{
     try{
