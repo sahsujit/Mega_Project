@@ -2,6 +2,8 @@ const User = require("../models/User");
 const Category = require("../models/Category")
 const Course = require("../models/Course");
 const { uploadImageToCloudinary } = require("../utils/imageUploader");
+const Section = require("../models/Section")
+const SubSection = require("../models/SubSection")
 
 
 
@@ -385,7 +387,7 @@ exports.getInstructorCourses = async (req, res) => {
       }
   
       // Unenroll students from the course
-      const studentsEnrolled = course.studentsEnroled
+      const studentsEnrolled = course.studentsEnrolled
       for (const studentId of studentsEnrolled) {
         await User.findByIdAndUpdate(studentId, {
           $pull: { courses: courseId },
