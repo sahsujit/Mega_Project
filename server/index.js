@@ -12,6 +12,9 @@ const cors = require("cors");
 const {cloudinaryConnect } = require("./config/cloudinary");
 const fileUpload = require("express-fileupload");
 const dotenv = require("dotenv");
+const bodyParser = require('body-parser');
+const {  verifyPayment } = require('./controllers/Payment')
+
 
 dotenv.config();
 const PORT =  4000;
@@ -19,6 +22,19 @@ const PORT =  4000;
 database.connectDb();
 //middlewares
 app.use(express.json());
+
+app.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+      next(); // Do nothing with the body because I need it in a raw state.
+    } else {
+      express.json()(req, res, next);  // ONLY do express.json() if the received request is NOT a WebHook from Stripe.
+    }
+  });
+
+//   app.use(cors())
+
+
+// app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
 app.use(cookieParser());
 app.use(
 	cors({
@@ -44,6 +60,7 @@ app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/reach", contactUsRoute);
 
 //def route
+app.post('/webhook', express.raw({type: 'application/json'}), verifyPayment)
 
 app.get("/", (req, res) => {
 	return res.json({
