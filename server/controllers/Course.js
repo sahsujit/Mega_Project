@@ -14,6 +14,17 @@ exports.createCourse = async (req, res) => {
   try {
     // Get user ID from request object
     const userId = req.user.id
+    // const {courseId} = req.body
+    // const Course = await Course.findById(courseId)
+
+
+
+
+    // let students
+    // for( let student in studentsEnrolled)
+    //   {
+    //    const updatedStudentDetails=await User.findByIdAndUpdate(studentsEnrolled[student],{ $pull:{courses : courseId}})
+    //   }
 
     // Get all required fields from request body
     let {
@@ -95,6 +106,7 @@ exports.createCourse = async (req, res) => {
       status: status,
       instructions,
     })
+    // await Course.findByIdAndDelete(courseId)
 
     // Add the new course to the User Schema of the Instructor
     await User.findByIdAndUpdate(
