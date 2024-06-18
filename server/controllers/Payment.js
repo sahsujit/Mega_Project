@@ -71,7 +71,7 @@ async function capturePayment(req, res) {
         },
       ],
 
-      success_url:`${process.env.FRONTEND_URL}/checkout-completed?session_id={CHECKOUT_SESSION_ID}`,
+      success_url:`http://localhost:3000/checkout-completed?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: process.env.FRONTEND_URL,
       metadata: {
         userId: userId,
@@ -138,6 +138,8 @@ async function verifyPayment(req, res) {
   const enrolledStudent = await user.findById(userId);
   for (let courseId in courses) {
     console.log(courseId);
+
+    console.log("courses", enrolledStudent)
     let Course;
     try {
       Course = await course.findById(courses[courseId]);
