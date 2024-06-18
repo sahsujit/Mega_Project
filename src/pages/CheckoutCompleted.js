@@ -8,6 +8,10 @@ const CheckoutCompleted = () => {
     const sessionId=searchParams.get("session_id")
     const navigate=useNavigate()
     const {token}=useSelector((store)=>store.auth)
+
+
+    const BASE_URL = 'http://localhost:4000/api/v1'; // Replace with your actual base URL
+
     async function verifyPayments(){
         const body={
             sessionId : sessionId
@@ -16,7 +20,7 @@ const CheckoutCompleted = () => {
             'Content-Type':"application/json",
             Authorization :`Bearer ${token}`
         }
-        const response=await fetch(`${process.env.REACT_APP_BASE_URL}/payment/verifyPayment`,{
+        const response=await fetch(`${BASE_URL}/payment/verifyPayment`,{
             method :"POST",
             headers : headers,
             body:JSON.stringify(body)
