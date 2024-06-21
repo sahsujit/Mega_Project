@@ -6,6 +6,8 @@ const Section = require("../models/Section")
 const SubSection = require("../models/SubSection")
 const CourseProgress = require("../models/CourseProgress")
 
+const {convertSecondsToDuration} = require ("../utils/secondToDuration")
+
 
 
 
@@ -367,6 +369,7 @@ exports.getCourseDetails = async(req, res) =>{
 exports.getFullCourseDetails = async (req, res) => {
   try {
     const { courseId } = req.body;
+    const userId = req.user.id
     
     // const userId = req.user.id
     const courseDetails = await Course.findOne({
@@ -388,10 +391,10 @@ exports.getFullCourseDetails = async (req, res) => {
       })
       .exec()
 
-    // let courseProgressCount = await CourseProgress.findOne({
-    //   courseID: courseId,
-    //   userId: userId,
-    // })
+    let courseProgressCount = await CourseProgress.findOne({
+      courseID: courseId,
+      userId: userId,
+    })
 
     
 
@@ -404,31 +407,31 @@ exports.getFullCourseDetails = async (req, res) => {
       })
     }
 
-    // if (courseDetails.status === "Draft") {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: `Accessing a draft course is forbidden`,
-    //   });
-    // }
+    if (courseDetails.status === "Draft") {
+      return res.status(403).json({
+        success: false,
+        message: `Accessing a draft course is forbidden`,
+      });
+    }
 
-    // let totalDurationInSeconds = 0
-    // courseDetails.courseContent.forEach((content) => {
-    //   content.subSection.forEach((subSection) => {
-    //     const timeDurationInSeconds = parseInt(subSection.timeDuration)
-    //     totalDurationInSeconds += timeDurationInSeconds
-    //   })
-    // })
+    let totalDurationInSeconds = 0
+    courseDetails.courseContent.forEach((content) => {
+      content.subSection.forEach((subSection) => {
+        const timeDurationInSeconds = parseInt(subSection.timeDuration)
+        totalDurationInSeconds += timeDurationInSeconds
+      })
+    })
 
-    // const totalDuration = convertSecondsToDuration(totalDurationInSeconds)
+    const totalDuration = convertSecondsToDuration(totalDurationInSeconds)
 
     return res.status(200).json({
       success: true,
       data: {
         courseDetails,
-        // totalDuration,
-        // completedVideos: courseProgressCount?.completedVideos
-        //   ? courseProgressCount?.completedVideos
-        //   : [],
+        totalDuration,
+        completedVideos: courseProgressCount?.completedVideos
+          ? courseProgressCount?.completedVideos
+          : [],
       },
     })
   } catch (error) {
