@@ -25,27 +25,30 @@ const VideoDetails = () => {
   const [loading, setLoading] = useState(false)
 
 
+
   useEffect(() => {
-    ; (() => {
+    ;(async () => {
       if (!courseSectionData.length) return
       if (!courseId && !sectionId && !subSectionId) {
         navigate(`/dashboard/enrolled-courses`)
+      } else {
+        // console.log("courseSectionData", courseSectionData)
+        const filteredData = courseSectionData.filter(
+          (course) => course._id === sectionId
+        )
+        // console.log("filteredData", filteredData)
+        const filteredVideoData = filteredData?.[0]?.subSection.filter(
+          (data) => data._id === subSectionId
+        )
+        // console.log("filteredVideoData", filteredVideoData)
+        setVideoData(filteredVideoData[0])
+        // console.log(filteredData[0])
+        setPreviewSource(courseEntireData.thumbnail)
+        setVideoEnded(false)
       }
-      const filteredData = courseSectionData.filter(
-        (course) => course._id === sectionId
-      )
-
-      const filteredVideoData = filteredData?.[0]?.subSection.filter(
-        (data) => data._id === subSectionId
-      )
-
-      setVideoData(filteredVideoData[0]);
-      setPreviewSource(courseEntireData.thumbnail)
-      setVideoEnded(false)
-
-
     })()
-  }, [courseSectionData, courseEntireData, location.pathname]);
+  }, [courseSectionData, courseEntireData, location.pathname])
+
 
   const isFirstVideo = () => {
     const currentSectionIndex = courseSectionData.findIndex(
@@ -111,38 +114,7 @@ const VideoDetails = () => {
 
   }
 
-  // const goToPrevVideo = () => {
-  //   const currentSectionIndex = courseSectionData.findIndex(
-  //     (data) => data._id === sectionId
-  //   )
 
-
-
-  //   const currentSubSectionIndex = courseSectionData[currentSectionIndex]?.subSection?.findIndex(
-  //     (data) => data._id === subSectionId
-  //   )
-
-  //   if (currentSubSectionIndex !== 0) {
-  //     const prevSubSectionId =
-  //       courseSectionData[currentSectionIndex].subSection[
-  //         currentSubSectionIndex - 1
-  //       ]._id
-  //     navigate(
-  //       `/view-course/${courseId}/section/${sectionId}/sub-section/${prevSubSectionId}`
-  //     )
-  //   } else {
-  //     const prevSectionId = courseSectionData[currentSectionIndex - 1]._id;
-  //     const prevSubSectionLength = courseSectionData[currentSectionIndex - 1]
-  //       .subSectionlength;
-  //     const prevSubSectionId = courseSectionData[currentSectionIndex - 1]
-  //       .subSection[prevSubSectionLength - 1]._id;
-
-  //     navigate(
-  //       `/view-course/${courseId}/section/${prevSectionId}/sub-section/${prevSubSectionId}`
-  //     )
-  //   }
-
-  // }
 
   const goToPrevVideo = () => {
     // console.log(courseSectionData)
