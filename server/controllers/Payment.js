@@ -220,8 +220,10 @@ async function enrollStudents(courses, userId, res) {
         { new: true }
       );
       const newCourseProgress=await courseProgress.create({
+        courseId : courses[courseId],
         userId : userId,
-        courseId : courses[courseId]
+        
+        completedVideos:[] ,
       })
       await user.findByIdAndUpdate(userId,{$push :{courseProgress : newCourseProgress._id}})
       const emailResponse = await mailSender(
