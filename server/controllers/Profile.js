@@ -3,6 +3,8 @@ const Profile = require("../models/Profile");
 const User = require("../models/User");
 const{uploadImageToCloudinary} = require("../utils/imageUploader");
 // const mongoose = require("mongoose")
+const Course = require("../models/Course")
+
 const { convertSecondsToDuration } = require("../utils/secondToDuration")
 const CourseProgress = require("../models/CourseProgress")
 
@@ -246,9 +248,10 @@ exports.updateDisplayPicture = async (req, res) => {
       const courseDetails = await Course.find({ instructor: req.user.id })
   
       const courseData = courseDetails.map((course) => {
-        const totalStudentsEnrolled = course.studentsEnroled.length
+        const totalStudentsEnrolled = course.studentsEnrolled.length
         const totalAmountGenerated = totalStudentsEnrolled * course.price
   
+        // console.log("courseData", courseData)
         // Create a new object with the additional fields
         const courseDataWithStats = {
           _id: course._id,
@@ -258,7 +261,7 @@ exports.updateDisplayPicture = async (req, res) => {
           totalStudentsEnrolled,
           totalAmountGenerated,
         }
-  
+        
         return courseDataWithStats
       })
   
